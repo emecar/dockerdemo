@@ -46,9 +46,15 @@ Containerizing Django App with Docker
 		select image group. Select hellodjango
 		Select image. Select latest.
 			or via CLI
-	docker run --rm -d -p 8000:8000/tcp hellodjango:latest 
+	docker run --rm -d -p 8000:8000/tcp hellodjango:latest  OR 
+	docker run -p 8080:8080 -p 50000:50000 --rm -d --name my_jenkins jenkins/jenkins:lts-jdk11  //NOTE: the --name flag changes the name when the container is run.
 6. Confirm the container is running
 		docker ps -a
+		
+Install Docker from remote dockerhub repository
+=================================================
+docker pull jenkins/jenkins:lts-jdk11
+
 
 Docker Operations
 =======================================
@@ -125,4 +131,24 @@ Create a Private Docker Registry
 2 Test the result by Removing the image from the local repository and attempting to pull it from local registry
 		docker rmi localhost:5000/hellodjango:v1
 		docker pull localhost:5000/hellodjango:v1
-		
+
+Persisting Docker Data (Using docker volumes)
+=============================================
+docker logs my_jenkins
+docker volume ls	
+
+docker run -p 8080:8080 -p 50000:50000 --rm -d --name my_jenkins -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk11
+	the flag -v will look for a volume named "jenkins_home" that is managed by Docker within the host machine's filesystem and map the containers - "/var/jenkins_home"
+
+Host static content by using a bind mount
+==================
+docker run --rm --name my_nginx -d -p 8080:80 -v /"$(pwd)":/usr/share/nginx/html:ro nginx:latest
+	//this example mounts a volume for hosting static web pages on nginx. "$(pwd)" specifies your present working directory
+
+docker volume inspect <volume name>
+
+Host static content by copying to a new image
+==============================================
+Enter this content into the Dockerfile
+	FROM nginx
+	COPY . /usr/share/nginx/html    //he result of this COPY instruction is that the contents of the using_nginx/ folder (i.e. the hello.html file) are copied to the Docker image's /usr/share/nginx/html folder.
