@@ -1,0 +1,76 @@
+// Dockerfile -> Docker Image -> Container
+//Docker files have no extension
+// Docker Compose - file used for running multiple containers. It is a .yml file
+
+First test your application can run locally in serve mode 
+===========================================================
+
+1. stop running containers:
+	docker stop pg_container
+	docker rm pg_container  //Docker will attempt to stop and remove the container named
+	
+
+2. download the starting files for the app // https://learn.nucamp.co/pluginfile.php/88933/mod_book/chapter/5241/hello_docker_django_vscode.zip?time=1634104265032
+3. create virtual environment inside the outer containing folder -> hell_docker_django_vscode 
+	python -m venv venv
+	. venv/scripts/activate  // Activate virtual environment  for windows
+4. Install requirements
+	cd hello_django
+	python -m pip install --upgrade pip==21.1.2  // This is optional
+	python -m pip install -r requirements.txt
+5. Start the django App	
+	python manage.py runserver 8000
+	
+Containerizing Django App with Docker
+=================================================
+
+1. Identify project root folder and run vscode from there
+	hello_django.
+2. Generate Dockerfile // either via vscode's command pallete or manually (assuming you know what to add)
+	If using vscode command pallete : ctrl+shift+p
+		Docker: Add Docker files to workspace
+		Select application platform: Python Django
+		Choose apps entry point: manage.py
+		port: 8000
+		include optional files: No
+3. Build Docker image
+	vscode command pallete : ctrl+shift+p
+		Docker Images: Build Image
+4. Confirm Docker image creation
+	docker images or via Docker GUI in windows
+5. Run container from Docker image
+	vscode command pallete : ctrl+shift+p
+		Docker Images: Run:
+		select image group. Select hellodjango
+		Select image. Select latest.
+			or via CLI
+	docker run --rm -d -p 8000:8000/tcp hellodjango:latest 
+6. Confirm the container is running
+		docker ps -a
+
+Docker Operations
+=======================================
+docker images //List Docker images
+docker inspect <ImageID>  // shows the configuration details of an image or container, along with network and other information.
+docker run --rm -d  -p 8000:8000/tcp hellodjango:latest
+		Flags
+			rm: tells Docker to remove this container automatically when it exits with docker stop or docker kill
+			-d: tells Docker to run the container in detached mode (in the background, without showing any log messages to the terminal) and to print the container ID. 
+			-p: port mapping source/destination i.e. computer/container
+docker ps // ist the Docker containers that are currently running
+docker ps -a // lists all Docker containers on the system, whether they are running or not
+docker history <ImageID> //To view the history of the Image
+docker top <ContainerID> // show the top processes running in the container.
+docker stats <ContainerID> // get a sense of the CPU usage, memory usage, and other operating system resource usage
+	Flag:
+		--no-stream //Pulls current result only
+docker pause <ContainerID>  // pauses the processes in a running Docker container. Hence pauses the Docker container
+docker unpause <ContainerID>
+docker stop <ContainerID>
+docker start <ContainerID>
+docker restart <ContainerID>
+docker kill <ContainerID>
+docker rm <ContainerID> //Removes Docker container
+docker rmi <ImageID> //Remove image from Docker repository
+
+
