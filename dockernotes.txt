@@ -36,6 +36,8 @@ Containerizing Django App with Docker
 3. Build Docker image
 	vscode command pallete : ctrl+shift+p
 		Docker Images: Build Image
+	CLI:
+		docker build -t hellodjango .   //the flag 't' is the name of the name-tag
 4. Confirm Docker image creation
 	docker images or via Docker GUI in windows
 5. Run container from Docker image
@@ -74,3 +76,53 @@ docker rm <ContainerID> //Removes Docker container
 docker rmi <ImageID> //Remove image from Docker repository
 
 
+Containerizing Django App with Docker Compose
+==============================================
+Docker Compose is typically used for multiple containers. docker-compose.yml is used to configure services that comprise these application parts
+
+1. Download starter file and Identify project root folder and run vscode from there.
+		https://learn.nucamp.co/pluginfile.php/88933/mod_book/chapter/5245/hello_django_docker_compose.zip
+
+2. Create docker-compose.yml file in the outer folder hello_django_docker_compose/ (NOT in App folder) 
+		version: "3.8"
+		services:
+		  web:
+			build: ./app
+			command: python manage.py runserver 0.0.0.0:8000
+			volumes:
+			  - ./app/:/usr/src/app/
+			ports:
+			  - 8000:8000
+3. Build the Docker image and start/stop container from CLI
+		docker compose up -d
+4. Verify and operate
+	docker ps  //how any docker containers that are running on the system
+	docker compose ps // only show containers created from images built from the docker-compose.yml file in the current directory, or any parent directory. 
+	docker compose stop 
+				// no container ID is required as an argument. It will stop all containers that were started with the docker compose up command
+				//Also, where docker stop <containerID> can be used from any directory, in order to use the docker compose stop command, you must be in the same directory as the docker-compose.yml file that was used to start the containers, or a child directory. 
+	docker compose down
+				//is a shortcut to both docker compose stop and docker compose rm in a single command. 
+				
+Docker Publishing
+=========================
+1. Log in to your Docker Hub account. - use github 
+2. Log in to Docker Hub using the below command 
+		winpty docker login
+3. Tag the hellodjango image with both the namespace and the version,  substitute in your own Docker Hub username for namespace:
+		docker tag hellodjango namespace/hellodjango:v1  example -> docker tag hellodjango emecar/hellodjango:v1
+4. 	push the Docker image to the Docker Hub registry
+		docker push namespace/hellodjango:v1 
+5.	docker logout
+
+Create a Private Docker Registry
+=============================
+1. Pull the Docker registry image from Docker Hub and run it
+		docker pull registry
+		docker run -d -p 5000:5000 registry  //Note: Private registry is now running on port 5000
+		docker tag hellodjango localhost:5000/hellodjango:v1  //Note: Instead of your Docker Hub username for the namespace, you are using localhost:5000, where the private registry container is running.
+		docker push localhost:5000/hellodjango:v1  //push the hellodjango image to the private registry
+2 Test the result by Removing the image from the local repository and attempting to pull it from local registry
+		docker rmi localhost:5000/hellodjango:v1
+		docker pull localhost:5000/hellodjango:v1
+		
