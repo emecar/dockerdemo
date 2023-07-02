@@ -222,3 +222,45 @@ docker run -d --rm --network=SRV_NET -p 8080:8080 -p 50000:50000 --ip 10.10.10.3
 
 http://localhost:8080/
 
+Linux (Ubuntu) Docker Install in amazon EC2
+=============================================
+
+ssh -i nucamp-private-key.pem ubuntu@<your EC2 instance Elastic IP address>  //The -i flag stands for identity-file and tells the SSH client to use your private key file to connect to the provided server address
+
+1. sudo apt update 		
+	 // update apt's package information
+2. sudo apt install apt-transport-https ca-certificates curl software-properties-common 
+	 //install these 3 pakages as a prerequisite for installing Docker,
+3. curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	 //This command uses the curl utility to download a public key file from Docker. It then takes that public key file and adds it to a list of trusted keys managed by APT
+4. sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+	 //adds the external Docker repository to APT's sources list.
+5. sudo apt update
+6. sudo apt install docker-ce
+	 //install Docker to your EC2 instance
+7. sudo usermod -aG docker ${USER}
+	 //adds the current user (the ubuntu user) to the docker group.
+8. sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+	 //downloads Docker Compose
+9. sudo chmod +x /usr/local/bin/docker-compose
+	 //changes the permissions of the downloaded docker-compose file to executable (+x) so that we can run it
+10. sudo su $USER
+	 //ensure that your session has access to the docker group
+
+11. docker -v
+12. docker-compose -v 
+	 //checks versions of docker and docker compose.
+	
+Install the AWS CLI
+======================
+//The AWS CLI is a command line tool provided by AWS to perform many functions in the AWS Cloud.
+//In our case, we will use the AWS CLI to interact with the Amazon ECR (Elastic Container Registry) from our EC2 instance.
+//We must interact with the ECR in order to pull Docker images.
+
+1. curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+		//download the AWS CLI zipfile 
+2. sudo apt install unzip 
+		//install the unzip CLI utility
+3. unzip awscliv2.zip 
+4. sudo ./aws/install 
+5. aws --version
