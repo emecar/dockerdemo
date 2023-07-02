@@ -151,7 +151,7 @@ Host static content by copying to a new image
 ==============================================
 Enter this content into the Dockerfile
 	FROM nginx
-	COPY . /usr/share/nginx/html    //he result of this COPY instruction is that the contents of the using_nginx/ folder (i.e. the hello.html file) are copied to the Docker image's /usr/share/nginx/html folder.
+	COPY . /usr/share/nginx/html    //the result of this COPY instruction is that the contents of the using_nginx/ folder (i.e. the hello.html file) are copied to the Docker image's /usr/share/nginx/html folder.
 	
 Docker Logs
 --------------------
@@ -264,3 +264,6 @@ Install the AWS CLI
 3. unzip awscliv2.zip 
 4. sudo ./aws/install 
 5. aws --version
+
+
+docker images -q | xargs docker rmi //To forcefully remove all images in linux/ubuntu:
