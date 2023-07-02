@@ -152,3 +152,73 @@ Host static content by copying to a new image
 Enter this content into the Dockerfile
 	FROM nginx
 	COPY . /usr/share/nginx/html    //he result of this COPY instruction is that the contents of the using_nginx/ folder (i.e. the hello.html file) are copied to the Docker image's /usr/share/nginx/html folder.
+	
+Docker Logs
+--------------------
+	View container logs
+	====================
+	1. run it without using the -d command 
+			docker run --rm --name my_nginx -p 8080:80 nginx:latest
+	2. When run  using the -d command
+			docker logs my_nginx
+			docker logs --follow my_nginx  //to see a live feed of the logs, as if you had started the container without the -d flag
+			
+	Docker daemon logs
+	===================
+	//The Docker daemon maintains a detailed log of events that happen for all of Docker, not only one container. 
+	//There is no CLI command to access these logs. Instead, find the location for the logs here:
+	//https://docs.docker.com/config/daemon/#read-the-logs
+	// For windows: go to cd ~/AppData/Local/Docker/log/vm.log
+		tail -f dockerd.log  // Entering this command opens a live stream of the Docker daemon logs.
+			//This will show mainly "error" and "info" level logs
+	Debug Level Logs:
+	==================
+		In the Docker Engine section, you can edit the configuration for the Docker daemon, which is in JSON format.
+		Add the "debug": true, property, exactly as shown below and restart the docker engine app.
+			{
+			  "builder": {
+				"gc": {
+				  "defaultKeepStorage": "20GB",
+				  "enabled": true
+				}
+			  },
+			  "debug": true,
+			  "experimental": false,
+			  "features": {
+				"buildkit": true
+			  }
+			}
+		go to cd ~/AppData/Local/Docker/log/vm.log
+		tail -f dockerd.log  // Entering this command opens a live stream of the Docker daemon logs.
+			//This will now show mainly "debug" level logs
+			
+Docker Networking
+===================
+docker network ls  //When a standalone container is newly created, it will connect to this default bridge network unless another network is specified.
+					// Containers that are managed by Docker Compose use a custom network with the bridge driver type. e.g. hello_django_docker_compose_default
+
+docker inspect bridge
+
+Create your own network
+========================
+docker network create my_network  //This will create a network using the bridge driver by default. Network created is "my_network"
+									// To create a network using a different driver, the -d flag is used. See: https://docs.docker.com/engine/reference/commandline/network_create/
+docker network ls
+docker inspect my_network
+docker run -d --rm --network=my_network -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts-jdk11
+									// using the --network flag...This runs a container on a custom network, we will 
+									
+docker inspect my_network
+
+Statically assigning  IP address to a container.
+=====================================================
+docker network create --subnet=<desired_subnet> <network_name>
+docker run --name <container_name> --network <network_name> --ip <desired_ip_address> <image_name>
+
+			example
+			========
+docker network create --subnet=10.10.10.0/24 SRV_NET
+docker run -d --rm --network=SRV_NET -p 8080:8080 -p 50000:50000 --ip 10.10.10.30 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk11
+
+http://localhost:8080/
+
